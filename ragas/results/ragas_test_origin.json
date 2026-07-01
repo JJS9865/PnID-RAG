@@ -1,0 +1,3079 @@
+{
+  "version": "0.1.0",
+  "description": "RAGAS TEST: risk(30), law(30), design(30), general(10)",
+  "samples": [
+    {
+      "id": "risk-001",
+      "user_input": "톨루엔을 취급하는 반응기에서 압력 상승이나 누출 시 공정 위험성을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "R-2001",
+            "equip_type": "반응기",
+            "material": "톨루엔",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "CSTR",
+              "용량": "12.5 m3",
+              "운전 압력": "3.5 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-002",
+      "user_input": "황산이 흐르는 열교환기에서 누출 시 작업자 화상 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2002",
+            "equip_type": "열교환기",
+            "material": "황산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-003",
+      "user_input": "메탄올을 저장하는 저장탱크에서 과충전이나 증기 폭발 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2003",
+            "equip_type": "저장탱크",
+            "material": "메탄올",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-004",
+      "user_input": "염소 가스를 처리하는 스크러버에서 누출 시 질식 위험을 평가해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "S-2004",
+            "equip_type": "스크러버",
+            "material": "염소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-005",
+      "user_input": "LPG를 소각하는 플레어에서 역화나 불꽃 소산 시 위험성을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "F-2005",
+            "equip_type": "플레어",
+            "material": "LPG",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Ground flare",
+              "처리용량": "10 t/h"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-006",
+      "user_input": "암모니아 가스를 압송하는 압축기에서 누출 시 폭발 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "C-2006",
+            "equip_type": "압축기",
+            "material": "암모니아 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "토출 압력": "15 barg",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-007",
+      "user_input": "벤젠을 분리하는 증류탑에서 과압이나 역류 시 화재 위험성을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "D-2007",
+            "equip_type": "증류탑",
+            "material": "벤젠",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "TRAYED",
+              "직경": "1.4 m",
+              "트레이 수": "30",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-008",
+      "user_input": "에틸렌옥사이드를 반응시키는 교반기에서 열폭주 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "A-2008",
+            "equip_type": "교반기",
+            "material": "에틸렌옥사이드",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Top entry",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-009",
+      "user_input": "수소 가스를 취급하는 펌프에서 누출 시 폭발 한계 농도를 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "P-2009",
+            "equip_type": "펌프",
+            "material": "수소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "양정": "50 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-010",
+      "user_input": "가성소다 용액을 이송하는 펌프에서 씨울 파손 시 화상 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "P-2010",
+            "equip_type": "펌프",
+            "material": "가성소다 용액",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "양정": "50 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-011",
+      "user_input": "황화수소를 흡수하는 흡수탑에서 노출 시 작업자 건강 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "AB-2011",
+            "equip_type": "흡수탑",
+            "material": "황화수소",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-012",
+      "user_input": "과산화수소를 저장하는 저장탱크에서 분해 반응으로 인한 과압 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2012",
+            "equip_type": "저장탱크",
+            "material": "과산화수소",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-013",
+      "user_input": "포스겐 가스를 배출하는 벤트 스택에서 누출 시 인명 피해 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "VS-2013",
+            "equip_type": "벤트 스택",
+            "material": "포스겐 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "높이": "25 m",
+              "직경": "0.5 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-014",
+      "user_input": "질산이 흐르는 열교환기에서 부식 누출 시 작업자 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2014",
+            "equip_type": "열교환기",
+            "material": "질산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-015",
+      "user_input": "아세톤을 혼합하는 혼합기에서 정전기 착화 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "M-2015",
+            "equip_type": "혼합기",
+            "material": "아세톤",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Top entry",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-016",
+      "user_input": "염산 가스를 세정하는 세정탑에서 누출 시 화상 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "W-2016",
+            "equip_type": "세정탑",
+            "material": "염산 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-017",
+      "user_input": "나프타를 가열하는 리보일러에서 과열이나 증기 폭발 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "RB-2017",
+            "equip_type": "리보일러",
+            "material": "나프타",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Kettle",
+              "전열면적": "80 m2",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-018",
+      "user_input": "크실렌을 담는 드럼에서 증기 폭발이나 인화 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "DR-2018",
+            "equip_type": "드럼",
+            "material": "크실렌",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "5 m3",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-019",
+      "user_input": "디젤을 가열하는 히터에서 과열 화재 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "HT-2019",
+            "equip_type": "히터",
+            "material": "디젤",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Fired heater",
+              "열부하": "2 MW",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-020",
+      "user_input": "프로판을 저장하는 저장탱크에서 BLEVE 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2020",
+            "equip_type": "저장탱크",
+            "material": "프로판",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-021",
+      "user_input": "톨루엔이 흐르는 제어밸브에서 누출 시 화재 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "CV-2021",
+            "equip_type": "제어밸브",
+            "material": "톨루엔",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Globe",
+              "Cv": "120",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-022",
+      "user_input": "암모니아를 냉각하는 냉각기에서 누출 시 질식 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2022",
+            "equip_type": "냉각기",
+            "material": "암모니아",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-023",
+      "user_input": "염소 가스 라인의 ESDV 미작동 시 대량 누출 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "ESDV-2023",
+            "equip_type": "ESDV",
+            "material": "염소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Emergency shutdown valve",
+              "동작 시간": "5 s",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-024",
+      "user_input": "메탄올을 완충 저장하는 버퍼탱크에서 증기 폭발 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "B-2024",
+            "equip_type": "버퍼탱크",
+            "material": "메탄올",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-025",
+      "user_input": "벤젠을 분리하는 분리기에서 정전기 착화 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "SP-2025",
+            "equip_type": "분리기",
+            "material": "벤젠",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Horizontal",
+              "직경": "1.0 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-026",
+      "user_input": "황산을 교반하는 교반기에서 스플래시나 부식 누출 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "A-2026",
+            "equip_type": "교반기",
+            "material": "황산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Top entry",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-027",
+      "user_input": "LPG를 완충하는 서지탱크에서 과압 파손 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "SG-2027",
+            "equip_type": "서지탱크",
+            "material": "LPG",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-028",
+      "user_input": "수소 가스 라인의 PSV 미작동 시 과압 폭발 위험을 분석해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "PSV-2028",
+            "equip_type": "PSV",
+            "material": "수소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Spring type",
+              "설정 압력": "12 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-029",
+      "user_input": "염산 증기를 응축하는 응축기에서 누출 시 화상 위험을 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "CD-2029",
+            "equip_type": "응축기",
+            "material": "염산 증기",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "risk-030",
+      "user_input": "에틸렌옥사이드 배출 라인의 역화방지기 고장 시 역화 위험이 있는지 알려줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "FA-2030",
+            "equip_type": "역화방지기",
+            "material": "에틸렌옥사이드",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Flame arrester",
+              "등급": "Deflagration",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-001",
+      "user_input": "염소 가스를 취급하는 저장탱크가 산업안전보건법상 밀폐공간 작업 허가 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2031",
+            "equip_type": "저장탱크",
+            "material": "염소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-002",
+      "user_input": "메탄올 등 인화성 액체를 취급하는 반응기에서 전기 설비 방폭 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "R-2032",
+            "equip_type": "반응기",
+            "material": "메탄올(인화성 액체)",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "CSTR",
+              "용량": "12.5 m3",
+              "운전 압력": "3.5 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-003",
+      "user_input": "LPG를 취급하는 플레어 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "F-2033",
+            "equip_type": "플레어",
+            "material": "LPG",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Ground flare",
+              "처리용량": "10 t/h"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-004",
+      "user_input": "암모니아를 취급하는 냉각기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2034",
+            "equip_type": "냉각기",
+            "material": "암모니아",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-005",
+      "user_input": "벤젠을 취급하는 증류탑 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "D-2035",
+            "equip_type": "증류탑",
+            "material": "벤젠",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "TRAYED",
+              "직경": "1.4 m",
+              "트레이 수": "30",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-006",
+      "user_input": "수소 가스를 취급하는 압축기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "C-2036",
+            "equip_type": "압축기",
+            "material": "수소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "토출 압력": "15 barg",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-007",
+      "user_input": "황산이 흐르는 열교환기 공정이 화학물질관리법 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2037",
+            "equip_type": "열교환기",
+            "material": "황산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-008",
+      "user_input": "가성소다를 취급하는 펌프 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "P-2038",
+            "equip_type": "펌프",
+            "material": "가성소다",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "양정": "50 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-009",
+      "user_input": "황화수소를 취급하는 흡수탑 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "AB-2039",
+            "equip_type": "흡수탑",
+            "material": "황화수소",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-010",
+      "user_input": "과산화수소를 저장하는 저장탱크가 위험물안전관리법상 정기점검 주기를 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2040",
+            "equip_type": "저장탱크",
+            "material": "과산화수소",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-011",
+      "user_input": "포스겐을 취급하는 배관 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "L-2041",
+            "equip_type": "배관",
+            "material": "포스겐",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "높이": "25 m",
+              "직경": "0.5 m",
+              "재질": "SS316L",
+              "용도": "벤트 스택 연결 배관"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-012",
+      "user_input": "질산을 취급하는 열교환기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2042",
+            "equip_type": "열교환기",
+            "material": "질산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-013",
+      "user_input": "아세톤을 취급하는 혼합기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "M-2043",
+            "equip_type": "혼합기",
+            "material": "아세톤",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Top entry",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-014",
+      "user_input": "염산 가스를 취급하는 세정탑 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "W-2044",
+            "equip_type": "세정탑",
+            "material": "염산 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-015",
+      "user_input": "나프타를 가열하는 열교환기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2045",
+            "equip_type": "열교환기",
+            "material": "나프타",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Reboiler",
+              "전열면적": "80 m2",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-016",
+      "user_input": "크실렌을 저장하는 저장탱크가 위험물안전관리자 선임 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2046",
+            "equip_type": "저장탱크",
+            "material": "크실렌",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "5 m3",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-017",
+      "user_input": "디젤 등 인화성 액체를 취급하는 히터 부근이 산업안전보건법상 전기 설비 방폭 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "HT-2047",
+            "equip_type": "히터",
+            "material": "디젤(인화성 액체)",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Fired heater",
+              "열부하": "2 MW",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-018",
+      "user_input": "프로판을 취급하는 저장탱크 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2048",
+            "equip_type": "저장탱크",
+            "material": "프로판",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-019",
+      "user_input": "톨루엔이 흐르는 제어밸브 라인에서 화학사고 발생 시 즉시 신고 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "CV-2049",
+            "equip_type": "제어밸브",
+            "material": "톨루엔",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Globe",
+              "Cv": "120",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-020",
+      "user_input": "암모니아를 취급하는 냉각기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2050",
+            "equip_type": "냉각기",
+            "material": "암모니아",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-021",
+      "user_input": "염소 가스를 취급하는 ESDV 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "ESDV-2051",
+            "equip_type": "ESDV",
+            "material": "염소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Emergency shutdown valve",
+              "동작 시간": "5 s",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-022",
+      "user_input": "메탄올을 취급하는 버퍼탱크 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "B-2052",
+            "equip_type": "버퍼탱크",
+            "material": "메탄올",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-023",
+      "user_input": "벤젠을 취급하는 분리기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "SP-2053",
+            "equip_type": "분리기",
+            "material": "벤젠",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Horizontal",
+              "직경": "1.0 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-024",
+      "user_input": "황산을 취급하는 교반기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "A-2054",
+            "equip_type": "교반기",
+            "material": "황산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Top entry",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-025",
+      "user_input": "LPG를 완충하는 서지탱크가 위험물안전관리자 선임 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "SG-2055",
+            "equip_type": "서지탱크",
+            "material": "LPG",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-026",
+      "user_input": "수소 가스를 취급하는 PSV 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "PSV-2056",
+            "equip_type": "PSV",
+            "material": "수소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Spring type",
+              "설정 압력": "12 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-027",
+      "user_input": "염산 증기를 취급하는 응축기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "CD-2057",
+            "equip_type": "응축기",
+            "material": "염산 증기",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-028",
+      "user_input": "에틸렌옥사이드를 취급하는 역화방지기 공정이 화학물질관리법상 유해화학물질 취급 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "FA-2058",
+            "equip_type": "역화방지기",
+            "material": "에틸렌옥사이드",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Flame arrester",
+              "등급": "Deflagration",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-029",
+      "user_input": "인화성 액체를 취급하는 반응기에서 전기 설비 방폭 미이행 시 산업안전보건법 처벌 대상인지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "R-2059",
+            "equip_type": "반응기",
+            "material": "인화성 액체",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "CSTR",
+              "용량": "12.5 m3",
+              "운전 압력": "3.5 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "law-030",
+      "user_input": "유해화학물질을 저장하는 저장탱크가 화학사고 예방관리계획서 제출 대상 기준을 위반했는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2060",
+            "equip_type": "저장탱크",
+            "material": "유해화학물질",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-001",
+      "user_input": "황산이 흐르는 열교환기의 배관 두께와 부식 여유 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2061",
+            "equip_type": "열교환기",
+            "material": "황산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-002",
+      "user_input": "메탄올을 취급하는 저장탱크의 차단밸브 및 긴급차단 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2062",
+            "equip_type": "저장탱크",
+            "material": "메탄올",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-003",
+      "user_input": "염소 가스를 취급하는 ESDV의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "ESDV-2063",
+            "equip_type": "ESDV",
+            "material": "염소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Emergency shutdown valve",
+              "동작 시간": "5 s",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-004",
+      "user_input": "톨루엔을 취급하는 반응기 압력용기 최소 두께 계산이 ASME 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "R-2064",
+            "equip_type": "반응기",
+            "material": "톨루엔",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "CSTR",
+              "용량": "12.5 m3",
+              "운전 압력": "3.5 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-005",
+      "user_input": "LPG를 취급하는 플레어의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "F-2065",
+            "equip_type": "플레어",
+            "material": "LPG",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Ground flare",
+              "처리용량": "10 t/h"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-006",
+      "user_input": "암모니아를 취급하는 냉각기 관련 배관 두께와 부식 여유 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2066",
+            "equip_type": "냉각기",
+            "material": "암모니아",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-007",
+      "user_input": "벤젠을 취급하는 증류탑 압력용기 최소 두께 계산이 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "D-2067",
+            "equip_type": "증류탑",
+            "material": "벤젠",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "TRAYED",
+              "직경": "1.4 m",
+              "트레이 수": "30",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-008",
+      "user_input": "수소 가스를 압송하는 압축기 토출 배관 맥동 방지 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "C-2068",
+            "equip_type": "압축기",
+            "material": "수소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "토출 압력": "15 barg",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-009",
+      "user_input": "가성소다를 이송하는 펌프의 NPSH 여유와 흡입 배관 설계가 가이드에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "P-2069",
+            "equip_type": "펌프",
+            "material": "가성소다",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Centrifugal",
+              "양정": "50 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-010",
+      "user_input": "황화수소를 취급하는 흡수탑 압력용기 최소 두께 계산이 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "AB-2070",
+            "equip_type": "흡수탑",
+            "material": "황화수소",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-011",
+      "user_input": "과산화수소를 취급하는 저장탱크의 차단밸브 및 긴급차단 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2071",
+            "equip_type": "저장탱크",
+            "material": "과산화수소",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-012",
+      "user_input": "포스겐을 취급하는 벤트 스택의 차단밸브 및 긴급차단 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "VS-2072",
+            "equip_type": "벤트 스택",
+            "material": "포스겐",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "높이": "25 m",
+              "직경": "0.5 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-013",
+      "user_input": "질산을 취급하는 열교환기 관련 배관 두께와 부식 여유 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2073",
+            "equip_type": "열교환기",
+            "material": "질산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-014",
+      "user_input": "아세톤을 취급하는 혼합기 관련 배관 두께와 부식 여유 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "M-2074",
+            "equip_type": "혼합기",
+            "material": "아세톤",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Top entry",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-015",
+      "user_input": "염산가스를 세정하는 세정탑의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "W-2075",
+            "equip_type": "세정탑",
+            "material": "염산 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Packed",
+              "직경": "1.2 m",
+              "재질": "FRP"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-016",
+      "user_input": "나프타를 취급하는 열교환기 압력용기 최소 두께 계산이 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2076",
+            "equip_type": "열교환기",
+            "material": "나프타",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Reboiler",
+              "전열면적": "80 m2",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-017",
+      "user_input": "크실렌을 저장하는 저장탱크의 차단밸브 및 긴급차단 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2077",
+            "equip_type": "저장탱크",
+            "material": "크실렌",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "5 m3",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-018",
+      "user_input": "디젤 등 인화성 액체를 취급하는 히터의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "HT-2078",
+            "equip_type": "히터",
+            "material": "디젤(인화성 액체)",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Fired heater",
+              "열부하": "2 MW",
+              "재질": "CS"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-019",
+      "user_input": "프로판을 취급하는 저장탱크의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "T-2079",
+            "equip_type": "저장탱크",
+            "material": "프로판",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-020",
+      "user_input": "톨루엔을 취급하는 제어밸브의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "CV-2080",
+            "equip_type": "제어밸브",
+            "material": "톨루엔",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Globe",
+              "Cv": "120",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-021",
+      "user_input": "암모니아를 취급하는 냉각기 관련 배관 두께와 부식 여유 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "E-2081",
+            "equip_type": "냉각기",
+            "material": "암모니아",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-022",
+      "user_input": "염소 가스를 취급하는 ESDV의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "ESDV-2082",
+            "equip_type": "ESDV",
+            "material": "염소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Emergency shutdown valve",
+              "동작 시간": "5 s",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-023",
+      "user_input": "메탄올을 취급하는 버퍼탱크의 차단밸브 및 긴급차단 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "B-2083",
+            "equip_type": "버퍼탱크",
+            "material": "메탄올",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-024",
+      "user_input": "벤젠을 취급하는 분리기의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "SP-2084",
+            "equip_type": "분리기",
+            "material": "벤젠",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Horizontal",
+              "직경": "1.0 m",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-025",
+      "user_input": "황산을 취급하는 반응기 압력용기 최소 두께 계산이 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "R-2085",
+            "equip_type": "반응기",
+            "material": "황산",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "교반 반응기",
+              "동력": "22 kW",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-026",
+      "user_input": "LPG를 취급하는 서지탱크의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "SG-2086",
+            "equip_type": "서지탱크",
+            "material": "LPG",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "용량": "50 m3",
+              "설계 압력": "2 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-027",
+      "user_input": "수소 가스를 취급하는 PSV의 안전밸브 및 파열판 설치 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "PSV-2087",
+            "equip_type": "PSV",
+            "material": "수소 가스",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Spring type",
+              "설정 압력": "12 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-028",
+      "user_input": "염산 증기를 취급하는 응축기 관련 배관 두께와 부식 여유 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "CD-2088",
+            "equip_type": "응축기",
+            "material": "염산 증기",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Shell & Tube",
+              "전열면적": "120 m2",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-029",
+      "user_input": "에틸렌옥사이드를 취급하는 역화방지기의 차단밸브 및 긴급차단 설계가 기준에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "FA-2089",
+            "equip_type": "역화방지기",
+            "material": "에틸렌옥사이드",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "Flame arrester",
+              "등급": "Deflagration",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "design-030",
+      "user_input": "에틸렌옥사이드 반응기의 압력 상승 시 안전밸브와 파열판 직렬 설치가 기술지침에 맞는지 검토해줘.",
+      "facility_info": {
+        "equipment_list": [
+          {
+            "equip_id": "R-2090",
+            "equip_type": "반응기",
+            "material": "에틸렌옥사이드",
+            "nozzle_list": [
+              {
+                "nozzle_id": "N1",
+                "dir": "in"
+              },
+              {
+                "nozzle_id": "N2",
+                "dir": "out"
+              }
+            ],
+            "specs": {
+              "형식": "CSTR",
+              "용량": "12.5 m3",
+              "운전 압력": "3.5 barg",
+              "재질": "SS316L"
+            }
+          }
+        ]
+      },
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-001",
+      "user_input": "점심 메뉴 추천해줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-002",
+      "user_input": "오늘 날씨 어때요?",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-003",
+      "user_input": "자기소개 해줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-004",
+      "user_input": "인생은 뭐라고 생각해?",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-005",
+      "user_input": "책 추천해줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-006",
+      "user_input": "재밌는 영화 추천해줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-007",
+      "user_input": "건강에 좋은 운동 루틴 알려줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-008",
+      "user_input": "최근 뉴스를 알려줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-009",
+      "user_input": "엑셀 함수 사용법 알려줘.",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    },
+    {
+      "id": "general-010",
+      "user_input": "오늘 주식 시장 동향이 어때?",
+      "facility_info": null,
+      "reference_contexts": [],
+      "reference_context_metadata": [],
+      "reference": null,
+      "retrieved_contexts": null,
+      "response": null
+    }
+  ]
+}

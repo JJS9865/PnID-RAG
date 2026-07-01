@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"C:\\\\Users\\\\wlwl4\" -type d -name \"*bge*\" 2>/dev/null | head -10)",
+      "Bash(find \"C:\\\\Users\\\\wlwl4\" -type d -name \"*BAAI*\" 2>/dev/null | head -10)",
+      "Bash(cd \"C:\\\\Users\\\\wlwl4\\\\OneDrive\\\\Documents\\\\카카오톡 받은 파일\\\\벡터DB 개선\\\\벡터DB 개선\" && python data/check_db.py 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\wlwl4\\\\OneDrive\\\\Documents\\\\카카오톡 받은 파일\\\\벡터DB 개선\\\\벡터DB 개선\" && set PYTHONIOENCODING=utf-8 && python data/check_db.py 2>&1)",
+      "Bash(cd \"/home/postech/Downloads/벡터DB 개선\" && python3 -c \"\nimport pandas as pd\ndf = pd.read_excel\\('화학물질 목록.xlsx'\\)\nprint\\('Shape:', df.shape\\)\nprint\\('Columns:', df.columns.tolist\\(\\)\\)\nprint\\(\\)\nprint\\(df.head\\(5\\).to_string\\(\\)\\)\n\")",
+      "Bash(pip show:*)",
+      "Bash(pip3 show:*)"
+    ]
+  }
+}

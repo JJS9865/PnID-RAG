@@ -1,0 +1,85 @@
+Total chars: 47438
+'Slide 5' count: 2
+
+--- pos 23456 ---
+═══════════════════════════
+# Slide 5: 사용자 질문 分析
+# ════════════════════════════════════════════════════════════════════════════
+
+def build_slide16(slide):
+    clear_slide(slide)
+    update_title(slide, "RAG 구축 - 사용자 질문 分析")
+    update_ti
+
+--- pos 46023 ---
+lides[5])
+
+        print("RAG Slide 5 (사용자 질문 分析) 구축...")
+        build_slide16(prs.slides[6])
+
+        print("RAG Slide 6 (Semantic Search) 구축...")
+        build_slide_semantic(prs.slides[7])
+
+        print("RAG Slide 7 (BM25 + Hybrid) 
+
+--- build_slide16 start ---
+.5,
+              col_widths=[4, 7, 8],
+              font_sz=8.5, header_sz=9.5,
+              h_data=PP_ALIGN.LEFT)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Slide 5: 사용자 질문 分析
+# ════════════════════════════════════════════════════════════════════════════
+
+def build_slide16(slide):
+    clear_slide(slide)
+    update_title(slide, "RAG 구축 - 사용자 질문 分析")
+    u
+
+--- All build_slide1x lines ---
+pos 9488: def build_slide14(slide):
+    clear_slide(slide)
+ 
+pos 12031: def build_slide14b(slide):
+    clear_slide(slide)
+
+pos 14475: def build_slide15(slide):
+    clear_slide(slide)
+ 
+pos 23555: def build_slide16(slide):
+    clear_slide(slide)
+ 
+pos 26885: def build_slide16(slide):
+    clear_slide(slide)
+ 
+pos 36526: def build_slide17(slide):
+    clear_slide(slide)
+ 
+pos 38789: def build_slide18(slide):
+    clear_slide(slide)
+ 
+
+--- Separator lines (21 total) ---
+pos 9304: 76 eq-signs, next: # Slide 1: DB 구축 — 전체 흐름\n# ═════════════════════════════════
+pos 9408: 76 eq-signs, next: \ndef build_slide14(slide):\n    clear_slide(slide)\n    update
+pos 11850: 76 eq-signs, next: # Slide 2: DB 구축 — 상세\n# ════════════════════════════════════
+pos 11951: 76 eq-signs, next: \ndef build_slide14b(slide):\n    clear_slide(slide)\n    updat
+pos 14295: 76 eq-signs, next: # Slide 15: DB 구축 현황\n# ═════════════════════════════════════
+pos 14395: 76 eq-signs, next: \ndef build_slide15(slide):\n    clear_slide(slide)\n    update
+pos 16477: 76 eq-signs, next: # Slide 4: 검색 파이프라인 — 전체 흐름\n# ══════════════════════════════
+pos 16584: 76 eq-signs, next: \ndef build_slide_pipeline(slide):\n    clear_slide(slide)\n   
+pos 23375: 76 eq-signs, next: # Slide 5: 사용자 질문 分析\n# ═════════════════════════════════════
+pos 23475: 76 eq-signs, next: \ndef build_slide16(slide):\n    clear_slide(slide)\n    update
+pos 26805: 76 eq-signs, next: \ndef build_slide16(slide):\n    clear_slide(slide)\n    update
+pos 29768: 76 eq-signs, next: # Slide 6: 검색 — Semantic Search\n# ══════════════════════════
+pos 29879: 76 eq-signs, next: \ndef build_slide_semantic(slide):\n    clear_slide(slide)\n   
+pos 33304: 76 eq-signs, next: # Slide 7: 검색 — BM25 + Hybrid Score\n# ══════════════════════
+pos 33419: 76 eq-signs, next: \ndef build_slide_bm25(slide):\n    clear_slide(slide)\n    upd
+pos 36323: 76 eq-signs, next: # Slide 8: 검색 — 2차 Cross-Encoder Re-ranking\n# ══════════════
+pos 36446: 76 eq-signs, next: \ndef build_slide17(slide):\n    clear_slide(slide)\n    update
+pos 43508: 76 eq-signs, next: # Main\n# ═══════════════════════════════════════════════════
+pos 43594: 76 eq-signs, next: \n# ═════════════════════════════════════════════════════════
+pos 43674: 76 eq-signs, next: # Slide 1: 수집 데이터 목록 업데이트 (사용자 추가 슬라이드)\n# ══════════════════
+pos 43793: 76 eq-signs, next: \ndef update_slide1_table(slide):\n    """Slide 1의 기존 표를 실제 co
