@@ -1,0 +1,8 @@
+huggingface_hub
+lancedb
+openpyxl
+pandas
+pyarrow
+pymupdf
+sentence-transformers
+tqdm
