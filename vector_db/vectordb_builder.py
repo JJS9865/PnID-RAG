@@ -1,42 +1,123 @@
 from __future__ import annotations
-
 import argparse
+import logging
+import os
 import re
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Event, Lock, Thread
+import pandas as pd
+import fitz
+import lancedb
+import pyarrow as pa
+VECTOR_DB_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(VECTOR_DB_ROOT))
+from config import EMBED_MODEL
 
 
-def _load_build_dependencies():
-    global pd, fitz, lancedb, pa, tqdm
-
-    import pandas as pd
-    import fitz
-    import lancedb
-    import pyarrow as pa
-    from tqdm import tqdm
+def resolve_vector_db_path(path: str | Path) -> Path:
+    path = Path(path)
+    if path.is_absolute():
+        return path
+    return VECTOR_DB_ROOT / path
 
 
-try:
-    from vector_db.vector_db_config import (
-        DEFAULT_EMBED_MODEL,
-        EMBED_MODEL_VARIANTS,
-        VECTOR_DB_ROOT,
-        VECTOR_DB_CONFIG,
-        resolve_vector_db_path,
-    )
-except ModuleNotFoundError:
-    from vector_db_config import (
-        DEFAULT_EMBED_MODEL,
-        EMBED_MODEL_VARIANTS,
-        VECTOR_DB_ROOT,
-        VECTOR_DB_CONFIG,
-        resolve_vector_db_path,
-    )
+TABLE_NAMES = ("accidents", "laws", "designs", "chemicals", "basics")
+
+VECTOR_DB_CONFIG = {
+    "VECTOR_DB_DIR": "./data/vector_db",
+    "ACCIDENTS_DIR": "./data/corpus/accidents",
+    "LAWS_DIR": "./data/corpus/laws",
+    "DESIGNS_DIR": "./data/corpus/designs",
+    "CHEMICALS_DIR": "./data/corpus/chemicals",
+    "BASICS_DIR": "./data/corpus/basics",
+    "EMBEDDING_MODEL": EMBED_MODEL,
+    "EMBEDDING_DIM": 1024,
+    "EMBED_BATCH_SIZE": 8,
+    "PARSE_WORKERS": min(8, os.cpu_count() or 1),
+    "EMBEDDING_CACHE_ENABLED": True,
+    "CHUNK_MAX_TOKENS": 1000,
+    "CHUNK_OVERLAP_TOKENS": 100,
+}
 
 CONFIG = dict(VECTOR_DB_CONFIG)
+logging.getLogger("transformers.tokenization_utils_base").setLevel(logging.ERROR)
+logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
+
+
+class TerminalProgressBar:
+    """터미널에 고정 폭 단일 줄 진행률 막대를 출력"""
+
+    _last_rendered_line_length = 0
+    _job_started_at: float | None = None
+
+    def __init__(self, label: str, total: int, width: int = 28) -> None:
+        """진행률 막대를 초기화"""
+        if TerminalProgressBar._job_started_at is None:
+            TerminalProgressBar._job_started_at = time.monotonic()
+        self.label = label
+        self.total = total
+        self.width = width
+        self.current = 0
+        self._lock = Lock()
+        self._stop_event = Event()
+        self._thread = Thread(target=self._render_elapsed, daemon=True)
+        self._thread.start()
+        self.render()
+
+    def advance(self, amount: int = 1) -> None:
+        """진행 수치를 증가"""
+        with self._lock:
+            self.current += amount
+            self._render_locked()
+
+    def finish(self) -> None:
+        """진행률 막대를 완료 상태로 종료"""
+        self._stop_event.set()
+        self._thread.join()
+        with self._lock:
+            self.current = self.total
+            self._render_locked()
+
+    def render(self) -> None:
+        """현재 진행률을 한 줄에 출력"""
+        with self._lock:
+            self._render_locked()
+
+    def _render_elapsed(self) -> None:
+        """경과 시간을 매초 갱신"""
+        while not self._stop_event.wait(1):
+            self.render()
+
+    def _elapsed_text(self) -> str:
+        """MM:SS 형식의 경과 시간을 반환"""
+        started_at = TerminalProgressBar._job_started_at or time.monotonic()
+        elapsed_seconds = int(time.monotonic() - started_at)
+        minutes = elapsed_seconds // 60
+        seconds = elapsed_seconds % 60
+        return f"{minutes:02d}:{seconds:02d}"
+
+    def _render_locked(self) -> None:
+        """잠금 안에서 현재 진행률을 출력"""
+        percent = 100 if self.total == 0 else int(self.current / self.total * 100)
+        filled = self.width if self.total == 0 else int(self.width * self.current / self.total)
+        bar = "#" * filled + "-" * (self.width - filled)
+        count_width = len(f"{self.total}/{self.total} (100%)")
+        count_text = f"{self.current}/{self.total} ({percent}%)".ljust(count_width)
+        line = (
+            f"[{bar}]  {self._elapsed_text()}  |  {count_text} |  {self.label}"
+        )
+        padding = " " * max(0, TerminalProgressBar._last_rendered_line_length - len(line))
+        print("\r" + line + padding, end="", flush=True)
+        TerminalProgressBar._last_rendered_line_length = len(line)
+
 
 CHEMICAL_ENTRY_PATTERN = re.compile(
     r"2\.\s*화학사고\s*현장\s*대응\s*물질\s*\(2025\)\s*-\s*물질\s*정보\s*460종\s*-[^\n]*"
 )
+CAS_NUMBER_RE = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
 # NFPA 위험등급 설명 줄 패턴 (화재N:/건강N:/반응N:/특수OX: 등)
 NFPA_DESC_RE = re.compile(r"^(화재|건강|반응)\d+:|^특수[\w\-]*\s*:")
 CHEMICAL_STOP_LABELS = (
@@ -44,6 +125,8 @@ CHEMICAL_STOP_LABELS = (
     "영문유사명",
     "ERG대응지침번호",
     "UN번호",
+    "화학물질군",
+    "유해화학물질관리번호",
     "구조CAS번호",
     "CAS번호",
     "유해위험문구",
@@ -56,7 +139,6 @@ CHEMICAL_STOP_LABELS = (
 
 class CorpusLoader:
     def __init__(self):
-        _load_build_dependencies()
         self.project_root = VECTOR_DB_ROOT
         self.corpus_root = resolve_vector_db_path("./data/corpus")
         self.vector_db_dir = resolve_vector_db_path(CONFIG["VECTOR_DB_DIR"])
@@ -68,8 +150,12 @@ class CorpusLoader:
         self.embedding_model_name = str(resolve_vector_db_path(CONFIG["EMBEDDING_MODEL"]))
         self.embedding_dim = CONFIG["EMBEDDING_DIM"]
         self.embed_batch_size = CONFIG["EMBED_BATCH_SIZE"]
+        self.parse_workers = CONFIG["PARSE_WORKERS"]
+        self.embedding_cache_enabled = CONFIG["EMBEDDING_CACHE_ENABLED"]
         self.chunk_max_tokens = CONFIG["CHUNK_MAX_TOKENS"]
         self.chunk_overlap_tokens = CONFIG["CHUNK_OVERLAP_TOKENS"]
+        self._embedding_cache: dict[str, list[float]] = {}
+        self._tokenizer_lock = Lock()
         self._model = None
         self._db = None
 
@@ -77,8 +163,10 @@ class CorpusLoader:
         if self._model is None:
             from sentence_transformers import SentenceTransformer
 
-            print(f"Loading embedding model: {self.embedding_model_name}")
+            progress = TerminalProgressBar("Loading embedding model", 1)
             self._model = SentenceTransformer(self.embedding_model_name)
+            progress.advance()
+            progress.finish()
         return self._model
 
     def _connect_db(self) -> lancedb.DBConnection:
@@ -87,25 +175,86 @@ class CorpusLoader:
             self._db = lancedb.connect(str(self.vector_db_dir))
         return self._db
 
-    def _embed(self, texts: list[str]) -> list[list[float]]:
-        model = self._load_model()
-        embeddings: list[list[float]] = []
-        for i in tqdm(
-            range(0, len(texts), self.embed_batch_size),
-            desc="  Embedding",
-            leave=False,
-        ):
-            batch = texts[i : i + self.embed_batch_size]
-            vecs = model.encode(batch, normalize_embeddings=True)
-            embeddings.extend(vecs.tolist())
-        return embeddings
+    def _table_exists(self, db: lancedb.DBConnection, table_name: str) -> bool:
+        if hasattr(db, "list_tables"):
+            tables = db.list_tables()
+            if hasattr(tables, "tables"):
+                tables = tables.tables
+            return table_name in tables
+        return table_name in db.table_names()
+
+    def _map_files(self, files: list[Path], worker, desc: str):
+        if self.parse_workers <= 1 or len(files) <= 1:
+            progress = TerminalProgressBar(desc, len(files))
+            results = []
+            for path in files:
+                results.append(worker(path))
+                progress.advance()
+            progress.finish()
+            return results
+
+        worker_count = min(self.parse_workers, len(files))
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            progress = TerminalProgressBar(desc, len(files))
+            results = []
+            for result in executor.map(worker, files):
+                results.append(result)
+                progress.advance()
+            progress.finish()
+            return results
+
+    def _embed(self, texts: list[str], label: str) -> list[list[float]]:
+        if not texts:
+            return []
+
+        if not self.embedding_cache_enabled:
+            model = self._load_model()
+            progress = TerminalProgressBar(label, len(texts))
+            vectors: list[list[float]] = []
+            for start in range(0, len(texts), self.embed_batch_size):
+                batch_texts = texts[start : start + self.embed_batch_size]
+                vecs = model.encode(
+                    batch_texts,
+                    batch_size=self.embed_batch_size,
+                    normalize_embeddings=True,
+                    show_progress_bar=False,
+                )
+                vectors.extend(vecs.tolist())
+                progress.advance(len(batch_texts))
+            progress.finish()
+            return vectors
+
+        missing: list[str] = []
+        seen_missing: set[str] = set()
+        for text in texts:
+            if text not in self._embedding_cache and text not in seen_missing:
+                missing.append(text)
+                seen_missing.add(text)
+
+        if missing:
+            model = self._load_model()
+            progress = TerminalProgressBar(label, len(missing))
+            for start in range(0, len(missing), self.embed_batch_size):
+                batch_texts = missing[start : start + self.embed_batch_size]
+                vecs = model.encode(
+                    batch_texts,
+                    batch_size=self.embed_batch_size,
+                    normalize_embeddings=True,
+                    show_progress_bar=False,
+                )
+                for text, vec in zip(batch_texts, vecs.tolist()):
+                    self._embedding_cache[text] = vec
+                progress.advance(len(batch_texts))
+            progress.finish()
+        return [self._embedding_cache[text] for text in texts]
 
     def _chunk_by_tokens(self, text: str) -> list[str]:
         text = text.strip()
         if not text:
             return []
         tokenizer = self._load_model().tokenizer
-        ids = tokenizer.encode(text, add_special_tokens=False)
+        with self._tokenizer_lock:
+            ids = tokenizer.encode(text, add_special_tokens=False)
         if len(ids) <= self.chunk_max_tokens:
             return [text]
         chunks = []
@@ -113,7 +262,8 @@ class CorpusLoader:
         step = self.chunk_max_tokens - self.chunk_overlap_tokens
         while start < len(ids):
             end = start + self.chunk_max_tokens
-            chunk_text = tokenizer.decode(ids[start:end], skip_special_tokens=True)
+            with self._tokenizer_lock:
+                chunk_text = tokenizer.decode(ids[start:end], skip_special_tokens=True)
             if chunk_text.strip():
                 chunks.append(chunk_text)
             if end >= len(ids):
@@ -602,9 +752,9 @@ class CorpusLoader:
             re.escape(item) for item in stop_labels if item != label
         )
         pattern = (
-            rf"{re.escape(label)}\s*(.+?)(?={stop_pattern}|$)"
+            rf"{re.escape(label)}\s*(.*?)(?={stop_pattern}|$)"
             if stop_pattern
-            else rf"{re.escape(label)}\s*(.+)"
+            else rf"{re.escape(label)}\s*(.*)"
         )
         match = re.search(pattern, text, flags=re.DOTALL)
         if not match:
@@ -636,27 +786,286 @@ class CorpusLoader:
             return "", raw_name
         return raw_name, ""
 
-    def _build_chemical_name(self, entry_text: str) -> str:
+    def _extract_chemical_name_lines(self, entry_text: str) -> list[str]:
+        """PDF entry 헤더에서 물질명 줄을 추출"""
         entry_match = CHEMICAL_ENTRY_PATTERN.search(entry_text)
         remainder = entry_text[entry_match.end() :] if entry_match else entry_text
-
-        lines = []
-        for line in remainder.splitlines():
-            cleaned = self._clean_inline_text(line)
-            if cleaned:
-                lines.append(cleaned)
-
-        raw_name = lines[0] if lines else ""
         raw_name = re.split(
-            r"구조CAS번호|CAS번호|국문유사명|영문유사명|ERG대응지침번호|UN번호",
-            raw_name,
+            r"(?:구조\s*)?CAS번호|국문유사명|영문유사명|ERG대응지침번호|UN번호",
+            remainder,
             maxsplit=1,
         )[0]
-        raw_name = self._clean_inline_text(raw_name)
-        korean_name, english_name = self._split_korean_english_name(raw_name)
+
+        lines: list[str] = []
+        for raw_line in raw_name.splitlines():
+            line = self._clean_inline_text(raw_line)
+            if line and line != "구조":
+                lines.append(line)
+        return lines
+
+    def _split_chemical_name_lines(self, name_lines: list[str]) -> tuple[str, str]:
+        """PDF 물질명 줄 구조를 기준으로 국문명과 영문명을 분리"""
+        if not name_lines:
+            return "", ""
+
+        english_start = None
+        for idx, line in enumerate(name_lines[1:], start=1):
+            if re.search(r"[A-Za-z]", line) and not re.search(r"[가-힣]", line):
+                english_start = idx
+                break
+
+        if english_start is not None:
+            korean_name = self._clean_inline_text(" ".join(name_lines[:english_start]))
+            english_name = self._clean_inline_text(" ".join(name_lines[english_start:]))
+            return korean_name, english_name
+
+        return self._split_korean_english_name(" ".join(name_lines))
+
+    def _extract_cas_number(self, entry_text: str) -> str:
+        """PDF entry에서 CAS 번호만 추출"""
+        value = self._extract_labeled_value(entry_text, "CAS번호", CHEMICAL_STOP_LABELS)
+        return CAS_NUMBER_RE.search(value).group(0)
+
+    def _normalize_chemical_field_value(self, value: str) -> str:
+        """PDF 화학물질 header의 결측 표기를 없음으로 통일"""
+        value = self._clean_inline_text(value)
+        if not value or re.fullmatch(r"[-–—]+", value):
+            return "없음"
+        return value
+
+    def _chemical_line_value(self, lines: list[str], label: str) -> str:
+        """PDF entry 라인에서 단일 label 값을 추출"""
+        for raw_line in lines:
+            line = raw_line.strip()
+            if line.startswith(label):
+                value = line.split(":", 1)[1] if ":" in line else ""
+                return self._normalize_chemical_field_value(value)
+        return "없음"
+
+    def _chemical_state_value(self, lines: list[str]) -> str:
+        """PDF 상태 값을 검색용 대표 상태로 축약"""
+        value = self._chemical_line_value(lines, "상태:")
+        if value == "없음":
+            return value
+        return re.split(r"[\s(/,]", value, maxsplit=1)[0]
+
+    def _is_chemical_continuation_stop(self, line: str) -> bool:
+        """PDF chemical 라인 연속 수집의 종료 지점 여부를 반환"""
+        if not line:
+            return False
+        stop_prefixes = (
+            "상태:",
+            "인화점:",
+            "폭발한계",
+            "발화점:",
+            "색상:",
+            "용해도",
+            "옥탄올/물",
+            "냄새:",
+            "밀도/비중:",
+            "용도",
+            "증기밀도:",
+            "작업장",
+            "일반 인구",
+            "분자식",
+            "pH:",
+            "끓는점:",
+            "탐지",
+            "개인보호구",
+            "NFPA 코드",
+            "국내규제",
+            "위험",
+            "그림문자",
+            "화재",
+            "누출",
+            "인체노출",
+            "응급조치",
+        )
+        return (
+            line.startswith("•")
+            or line.startswith(stop_prefixes)
+            or bool(re.match(r"^(화재|건강|반응)\d+\s*:", line))
+            or bool(re.match(r"^특수[\w\\\-]*\s*:", line))
+            or line in {"취", "급", "시", "진압", "요령"}
+        )
+
+    def _clean_chemical_sentence(self, value: str) -> str:
+        """PDF에서 이어 붙인 화학물질 설명 문장을 정리"""
+        value = self._clean_inline_text(value)
+        value = re.sub(r"(?<!\s)\((※|인화점)", r" (\1", value)
+        return value
+
+    def _collect_chemical_continuation(
+        self,
+        lines: list[str],
+        start_idx: int,
+        first_value: str,
+    ) -> tuple[str, int]:
+        """PDF 라인의 다음 label 전까지 이어지는 설명을 수집"""
+        parts = [first_value.strip()]
+        idx = start_idx + 1
+        while idx < len(lines):
+            line = lines[idx].strip()
+            if not line:
+                idx += 1
+                continue
+            if self._is_chemical_continuation_stop(line):
+                break
+            parts.append(line)
+            idx += 1
+        return self._clean_chemical_sentence(" ".join(parts)), idx
+
+    def _extract_chemical_fire_text(self, lines: list[str]) -> str:
+        """PDF 화재 및 폭발 가능성 bullet을 추출"""
+        for idx, raw_line in enumerate(lines):
+            line = raw_line.strip()
+            if line.startswith("• 화재 및 폭발 가능성"):
+                value = line.split(":", 1)[1] if ":" in line else line.replace("• 화재 및 폭발 가능성", "")
+                value, _ = self._collect_chemical_continuation(lines, idx, value)
+                return "없음" if value == "-" else value
+        return "없음"
+
+    def _extract_chemical_nfpa_bullets(self, lines: list[str]) -> list[str]:
+        """PDF NFPA 코드 설명을 markdown bullet로 추출"""
+        bullets: list[str] = []
+        idx = 0
+        while idx < len(lines):
+            line = lines[idx].strip()
+            match = re.match(r"^(화재|건강|반응)\d+\s*:\s*(.*)$", line)
+            if match:
+                value, next_idx = self._collect_chemical_continuation(lines, idx, match.group(2))
+                bullets.append(f"- {value}")
+                idx = next_idx
+                continue
+
+            special_match = re.match(r"^특수[\w\\\-]*\s*:\s*(.*)$", line)
+            if special_match and special_match.group(1).strip() not in {"", "-"}:
+                value, next_idx = self._collect_chemical_continuation(lines, idx, special_match.group(1))
+                if bullets:
+                    bullets[-1] += value
+                idx = next_idx
+                continue
+
+            idx += 1
+        return bullets
+
+    def _extract_chemical_regulation_class(self, lines: list[str]) -> str:
+        """PDF 국내규제 영역에서 위험요소 분류만 추출"""
+        start_idx = None
+        end_idx = None
+        for idx, line in enumerate(lines):
+            if line.strip() == "국내규제":
+                start_idx = idx + 1
+            elif start_idx is not None and line.strip() == "위험":
+                end_idx = idx
+                break
+        if start_idx is None or end_idx is None:
+            return "없음"
+
+        classes: list[str] = []
+        for raw_line in lines[start_idx:end_idx]:
+            line = self._clean_inline_text(raw_line)
+            if not line or line == "-" or re.match(r"^제\d+류", line):
+                continue
+            if line in {"노출", "노출, 작업, 관리", "가연성", "(비수용성)", "(수용성)"}:
+                continue
+            if any(item in line for item in ("사고대비물질", "유독물질", "제한물질", "금지물질", "허가물질")):
+                classes.append(line)
+        return ", ".join(classes) if classes else "없음"
+
+    def _normalize_chemical_hazard_bullet(self, value: str) -> str:
+        """PDF 그림문자/위험 bullet의 줄 결합 노이즈를 정리"""
+        value = self._clean_chemical_sentence(value)
+        value = value.replace("-1회노출", "-1회 노출")
+        value = value.replace("-1회 노 출", "-1회 노출")
+        return value
+
+    def _collect_chemical_bullet(self, lines: list[str], start_idx: int) -> tuple[str, int]:
+        """PDF bullet과 이어진 줄을 하나의 markdown bullet 값으로 결합"""
+        line = lines[start_idx].strip()
+        parts = [re.sub(r"^[•*]\s*", "", line)]
+        idx = start_idx + 1
+        section_stops = {
+            "그림문자",
+            "화재",
+            "누출",
+            "인체노출 유해성 / 증상",
+            "응급조치",
+            "진압",
+            "요령",
+        }
+        while idx < len(lines):
+            next_line = lines[idx].strip()
+            if not next_line:
+                idx += 1
+                continue
+            if next_line.startswith("•") or next_line in section_stops:
+                break
+            parts.append(next_line)
+            idx += 1
+        return self._normalize_chemical_hazard_bullet(" ".join(parts)), idx
+
+    def _extract_chemical_section_bullets(
+        self,
+        lines: list[str],
+        section_label: str,
+        stop_labels: set[str],
+    ) -> list[str]:
+        """PDF section의 bullet 목록을 markdown bullet로 추출"""
+        start_idx = None
+        for idx, line in enumerate(lines):
+            if line.strip() == section_label:
+                start_idx = idx + 1
+                break
+        if start_idx is None:
+            return []
+
+        bullets: list[str] = []
+        idx = start_idx
+        while idx < len(lines):
+            line = lines[idx].strip()
+            if line in stop_labels:
+                break
+            if line.startswith("•"):
+                value, next_idx = self._collect_chemical_bullet(lines, idx)
+                bullets.append(f"- {value}")
+                idx = next_idx
+                continue
+            idx += 1
+        return bullets
+
+    def _build_chemical_curated_body(self, entry_text: str) -> str:
+        """PDF entry에서 검색용 화학물질 정제 본문을 구성"""
+        lines = entry_text.splitlines()
+        body_lines = [
+            "[물리화학적 특성]",
+            f"- 상태: {self._chemical_state_value(lines)}",
+            f"- 색상: {self._chemical_line_value(lines, '색상:')}",
+            f"- 화재 및 폭발 가능성: {self._extract_chemical_fire_text(lines)}",
+            *self._extract_chemical_nfpa_bullets(lines),
+            "",
+            "[위험요소]",
+            f"- 분류: {self._extract_chemical_regulation_class(lines)}",
+            *self._extract_chemical_section_bullets(
+                lines,
+                "위험",
+                {"그림문자", "화재", "누출", "인체노출 유해성 / 증상", "응급조치"},
+            ),
+            *self._extract_chemical_section_bullets(
+                lines,
+                "그림문자",
+                {"화재", "누출", "인체노출 유해성 / 증상", "응급조치"},
+            ),
+        ]
+        return "\n".join(body_lines).strip()
+
+    def _build_chemical_name(self, entry_text: str) -> str:
+        name_lines = self._extract_chemical_name_lines(entry_text)
+        raw_name = self._clean_inline_text(" ".join(name_lines))
+        korean_name, english_name = self._split_chemical_name_lines(name_lines)
 
         if korean_name and english_name:
-            base_name = f"{korean_name}({english_name})"
+            base_name = f"{korean_name} | {english_name}"
         else:
             base_name = korean_name or english_name or raw_name or "이름 미상"
 
@@ -671,14 +1080,47 @@ class CorpusLoader:
             CHEMICAL_STOP_LABELS,
         )
         alias_text = ", ".join(
-            part for part in [korean_alias, english_alias] if part
+            part for part in [korean_alias, english_alias] if part and part not in {"-", "없음"}
         )
         return f"{base_name} | {alias_text}" if alias_text else base_name
+
+    def _build_chemical_markdown_text(self, entry_text: str) -> str:
+        """PDF 화학물질 entry를 검색용 markdown 텍스트로 변환"""
+        name_lines = self._extract_chemical_name_lines(entry_text)
+        korean_name, english_name = self._split_chemical_name_lines(name_lines)
+        display_name = (
+            f"{korean_name} | {english_name}"
+            if korean_name and english_name
+            else korean_name or english_name or self._clean_inline_text(" ".join(name_lines))
+        )
+        labels = (
+            ("CAS번호", "CAS번호"),
+            ("국문 유사명", "국문유사명"),
+            ("영문 유사명", "영문유사명"),
+            ("ERG대응지침번호", "ERG대응지침번호"),
+            ("UN번호", "UN번호"),
+            ("화학물질군", "화학물질군"),
+            ("유해화학물질관리번호", "유해화학물질관리번호"),
+        )
+        lines = [
+            "[물질 정보]",
+            f"- 물질명: {display_name}",
+        ]
+        for display_label, source_label in labels:
+            if source_label == "CAS번호":
+                value = self._extract_cas_number(entry_text)
+            else:
+                value = self._normalize_chemical_field_value(
+                    self._extract_labeled_value(entry_text, source_label, CHEMICAL_STOP_LABELS)
+                )
+            lines.append(f"- {display_label}: {value}")
+
+        lines.extend(["", self._build_chemical_curated_body(entry_text)])
+        return "\n".join(lines).strip()
 
     def _load_chemical_list(self, xlsx_path: Path) -> list[tuple[str, str]]:
         """화학물질 목록_재정렬.xlsx를 읽어 (ko_name, en_name) 리스트 반환 (460종, 순서대로)."""
         if not xlsx_path.exists():
-            print(f"Warning: {xlsx_path} not found. chemical_name will use PDF-extracted names.")
             return []
 
         df = pd.read_excel(xlsx_path)
@@ -878,7 +1320,10 @@ class CorpusLoader:
     def _load_safety_center_file(self, path: Path) -> list[dict]:
         """안전원_P&ID 국내 화학사고 모음 파일을 읽어 표준 사고 레코드 리스트를 반환합니다."""
         records: list[dict] = []
+        progress = TerminalProgressBar(f"Reading {path.stem}", 1)
         xl = pd.ExcelFile(path)
+        progress.advance()
+        progress.finish()
 
         def _s(row: pd.Series, key: str) -> str:
             val = row.get(key, "")
@@ -886,16 +1331,21 @@ class CorpusLoader:
 
         # 시트1: 분석자료(최종) — PSM 중대산업사고
         if "분석자료(최종)" in xl.sheet_names:
+            progress = TerminalProgressBar("Reading 분석자료(최종)", 1)
             df = xl.parse("분석자료(최종)")
+            progress.advance()
+            progress.finish()
             # 실제 데이터 컬럼 확인 (개  요 컬럼명에 공백 포함)
             overview_col = next((c for c in df.columns if "개" in str(c) and "요" in str(c)), None)
-            for i, row in tqdm(df.iterrows(), total=len(df), desc="  분석자료(최종)"):
+            progress = TerminalProgressBar("분석자료(최종)", len(df))
+            for i, row in df.iterrows():
                 accident  = _s(row, overview_col) if overview_col else ""
                 equipment = _s(row, "사고설비")
                 material  = _s(row, "사고물질")
                 acc_type  = _s(row, "발생형태")
                 cause     = _s(row, "사고원인")
                 if not accident and not material and not equipment:
+                    progress.advance()
                     continue
                 records.append({
                     "accident": accident,
@@ -906,17 +1356,24 @@ class CorpusLoader:
                     "origin": "안전원_PSM",
                     "id_prefix": f"safety_psm_{i+1:04d}",
                 })
+                progress.advance()
+            progress.finish()
 
         # 시트2: 환경부(사고데이터) — 환경부 사고 데이터
         if "환경부(사고데이터)" in xl.sheet_names:
+            progress = TerminalProgressBar("Reading 환경부(사고데이터)", 1)
             df = xl.parse("환경부(사고데이터)")
-            for i, row in tqdm(df.iterrows(), total=len(df), desc="  환경부(사고데이터)"):
+            progress.advance()
+            progress.finish()
+            progress = TerminalProgressBar("환경부(사고데이터)", len(df))
+            for i, row in df.iterrows():
                 accident  = _s(row, "사고내용")
                 equipment = _s(row, "사고 설비")
                 material  = _s(row, "제1사고물질")
                 acc_type  = _s(row, "사고유형")
                 cause     = _s(row, "사고원인")
                 if not accident and not material and not equipment:
+                    progress.advance()
                     continue
                 records.append({
                     "accident": accident,
@@ -927,28 +1384,31 @@ class CorpusLoader:
                     "origin": "안전원_환경부",
                     "id_prefix": f"safety_env_{i+1:04d}",
                 })
+                progress.advance()
+            progress.finish()
 
         return records
 
-    def load_accidents(self):
-        print("\n=== Loading accidents ===")
-        db = self._connect_db()
+    def _collect_accidents_records(self) -> list[dict]:
         records: list[dict] = []
 
         xlsx_files = sorted(self.accidents_dir.glob("*.xlsx"))
-        print(f"Found {len(xlsx_files)} accident XLSXs")
 
         for xlsx_path in xlsx_files:
-            print(f"Reading {xlsx_path.name} ...")
+            progress = TerminalProgressBar(f"Reading {xlsx_path.stem}", 1)
             df = pd.read_excel(xlsx_path)
+            progress.advance()
+            progress.finish()
             file_tag = xlsx_path.stem.replace(" ", "_")
-            for i, row in tqdm(df.iterrows(), total=len(df), desc=f"  {xlsx_path.stem}"):
+            progress = TerminalProgressBar(xlsx_path.stem, len(df))
+            for i, row in df.iterrows():
                 accident  = str(row.get("Accident", "") or "").strip()
                 equipment = str(row.get("Equipment", "") or "").strip()
                 material  = str(row.get("Material", "") or "").strip()
                 acc_type  = str(row.get("Type", "") or "").strip()
                 cause     = str(row.get("Cause", "") or "").strip()
                 if not accident and not material and not equipment:
+                    progress.advance()
                     continue
                 text = (
                     f"[사고내용] {accident}\n"
@@ -968,13 +1428,15 @@ class CorpusLoader:
                     "cause":         cause,
                     "origin":        file_tag,
                 })
+                progress.advance()
+            progress.finish()
 
-        if not records: return
-        print(f"Total accident records: {len(records)}")
+        return records
 
-        text_vectors = self._embed([r["text"] for r in records])
-        material_vectors = self._embed([r["material"] for r in records])
-        equipment_vectors = self._embed([r["equipment"] for r in records])
+    def _embed_accidents_records(self, records: list[dict]) -> None:
+        text_vectors = self._embed([r["text"] for r in records], "Embedding accidents text")
+        material_vectors = self._embed([r["material"] for r in records], "Embedding accidents material")
+        equipment_vectors = self._embed([r["equipment"] for r in records], "Embedding accidents equipment")
         for r, text_v, material_v, equipment_v in zip(
             records,
             text_vectors,
@@ -985,6 +1447,8 @@ class CorpusLoader:
             r["material_vector"] = material_v
             r["equipment_vector"] = equipment_v
 
+    def _write_accidents_records(self, records: list[dict]) -> None:
+        db = self._connect_db()
         schema = pa.schema([
             pa.field("id",            pa.string()),
             pa.field("text",          pa.string()),
@@ -999,45 +1463,59 @@ class CorpusLoader:
             pa.field("cause",         pa.string()),
             pa.field("origin",        pa.string()),
         ])
-        if "accidents" in db.table_names():
+        progress = TerminalProgressBar("Writing accidents", 1)
+        if self._table_exists(db, "accidents"):
             db.drop_table("accidents")
-        table = db.create_table("accidents", data=records, schema=schema)
-        print(f"accidents table: {table.count_rows()} rows written.")
+        db.create_table("accidents", data=records, schema=schema)
+        progress.advance()
+        progress.finish()
 
-    def load_laws(self):
-        print("\n=== Loading laws ===")
-        db = self._connect_db()
+    def load_accidents(self):
+        records = self._collect_accidents_records()
+        if not records:
+            return
+        self._embed_accidents_records(records)
+        self._write_accidents_records(records)
 
-        pdf_files = sorted(self.laws_dir.rglob("*.pdf"))
-        print(f"Found {len(pdf_files)} law PDFs")
-
-        records: list[dict] = []
-        for pdf_path in tqdm(pdf_files, desc="  Laws PDFs"):
-            source_path = self._source_path(pdf_path)
+    def _law_records_for_pdf(self, pdf_path: Path) -> list[dict]:
+        source_path = self._source_path(pdf_path)
+        return [
+            {
+                "id":          f"{pdf_path.stem}_{chunk_id:04d}",
+                "text":        chunk,
+                "source":      pdf_path.name,
+                "chunk_id":    chunk_id,
+                "page":        page_num,
+                "source_path": source_path,
+                "title":       law_title,
+                "article":     article,
+            }
             for chunk_id, (page_num, chunk, law_title, article) in enumerate(
                 self._chunk_law_by_article(pdf_path)
-            ):
-                records.append({
-                    "id":          f"{pdf_path.stem}_{chunk_id:04d}",
-                    "text":        chunk,
-                    "source":      pdf_path.name,
-                    "chunk_id":    chunk_id,
-                    "page":        page_num,
-                    "source_path": source_path,
-                    "title":       law_title,
-                    "article":     article,
-                })
+            )
+        ]
 
-        if not records: return
-        print(f"Total law chunks: {len(records)}")
-        text_vectors    = self._embed([r["text"]    for r in records])
-        title_vectors   = self._embed([r["title"]   for r in records])
-        article_vectors = self._embed([r["article"] for r in records])
+    def _collect_laws_records(self) -> list[dict]:
+        pdf_files = sorted(self.laws_dir.rglob("*.pdf"))
+
+        records: list[dict] = []
+        self._load_model()
+        for pdf_records in self._map_files(pdf_files, self._law_records_for_pdf, "  Laws PDFs"):
+            records.extend(pdf_records)
+
+        return records
+
+    def _embed_laws_records(self, records: list[dict]) -> None:
+        text_vectors    = self._embed([r["text"]    for r in records], "Embedding laws text")
+        title_vectors   = self._embed([r["title"]   for r in records], "Embedding laws title")
+        article_vectors = self._embed([r["article"] for r in records], "Embedding laws article")
         for r, tv, lv, av in zip(records, text_vectors, title_vectors, article_vectors):
             r["text_vector"]    = tv
             r["title_vector"]   = lv
             r["article_vector"] = av if r["article"] else tv  # 빈 article이면 text_vector 복사
 
+    def _write_laws_records(self, records: list[dict]) -> None:
+        db = self._connect_db()
         schema = pa.schema([
             pa.field("id",               pa.string()),
             pa.field("text",             pa.string()),
@@ -1051,49 +1529,61 @@ class CorpusLoader:
             pa.field("article",          pa.string()),
             pa.field("article_vector",   pa.list_(pa.float32(), self.embedding_dim)),
         ])
-        if "laws" in db.table_names():
+        progress = TerminalProgressBar("Writing laws", 1)
+        if self._table_exists(db, "laws"):
             db.drop_table("laws")
         table = db.create_table("laws", data=records, schema=schema)
         table.create_fts_index("text", replace=True)
-        print(f"laws table: {table.count_rows()} rows written.")
+        progress.advance()
+        progress.finish()
 
-    def load_designs(self):
-        print("\n=== Loading designs ===")
-        db = self._connect_db()
+    def load_laws(self):
+        records = self._collect_laws_records()
+        if not records:
+            return
+        self._embed_laws_records(records)
+        self._write_laws_records(records)
 
+    def _design_records_for_pdf(self, pdf_path: Path) -> list[dict]:
+        source_path = self._source_path(pdf_path)
+        parts = pdf_path.parent.relative_to(self.designs_dir).parts
+        category = f"{parts[0]}: {parts[1]}" if len(parts) >= 2 else parts[0]
+        title = self._extract_design_title(pdf_path)
+        return [
+            {
+                "id":          f"{pdf_path.stem}_{chunk_id:04d}",
+                "text":        chunk,
+                "source":      pdf_path.name,
+                "chunk_id":    chunk_id,
+                "page":        page_num,
+                "source_path": source_path,
+                "category":    category,
+                "title":       title,
+                "section":     section,
+                "subsection":  subsection,
+            }
+            for chunk_id, (page_num, chunk, section, subsection) in enumerate(
+                self._chunk_design_by_heading(pdf_path)
+            )
+        ]
+
+    def _collect_designs_records(self) -> list[dict]:
         records: list[dict] = []
         if not self.designs_dir.exists():
-            print(f"Error: {self.designs_dir} does not exist.")
-            return
+            return records
 
         pdf_files = sorted(self.designs_dir.rglob("*.pdf"))
-        print(f"Found {len(pdf_files)} design PDFs")
-        for pdf_path in tqdm(pdf_files, desc="  Designs PDFs"):
-            source_path = self._source_path(pdf_path)
-            parts = pdf_path.parent.relative_to(self.designs_dir).parts
-            category = f"{parts[0]}: {parts[1]}" if len(parts) >= 2 else parts[0]
-            title = self._extract_design_title(pdf_path)
-            design_chunks = self._chunk_design_by_heading(pdf_path)
-            for chunk_id, (page_num, chunk, section, subsection) in enumerate(design_chunks):
-                records.append({
-                    "id":          f"{pdf_path.stem}_{chunk_id:04d}",
-                    "text":        chunk,
-                    "source":      pdf_path.name,
-                    "chunk_id":    chunk_id,
-                    "page":        page_num,
-                    "source_path": source_path,
-                    "category":    category,
-                    "title":       title,
-                    "section":     section,
-                    "subsection":  subsection,
-                })
+        self._load_model()
+        for pdf_records in self._map_files(pdf_files, self._design_records_for_pdf, "  Designs PDFs"):
+            records.extend(pdf_records)
 
-        if not records: return
-        print(f"Total design chunks: {len(records)}")
-        text_vectors       = self._embed([r["text"]       for r in records])
-        title_vectors      = self._embed([r["title"]      for r in records])
-        section_vectors    = self._embed([r["section"]    for r in records])
-        subsection_vectors = self._embed([r["subsection"] for r in records])
+        return records
+
+    def _embed_designs_records(self, records: list[dict]) -> None:
+        text_vectors       = self._embed([r["text"]       for r in records], "Embedding designs text")
+        title_vectors      = self._embed([r["title"]      for r in records], "Embedding designs title")
+        section_vectors    = self._embed([r["section"]    for r in records], "Embedding designs section")
+        subsection_vectors = self._embed([r["subsection"] for r in records], "Embedding designs subsection")
         for r, tv, gv, sv, ssv in zip(
             records,
             text_vectors,
@@ -1106,6 +1596,8 @@ class CorpusLoader:
             r["section_vector"]    = sv if r["section"] else tv
             r["subsection_vector"] = ssv if r["subsection"] else r["section_vector"]
 
+    def _write_designs_records(self, records: list[dict]) -> None:
+        db = self._connect_db()
         schema = pa.schema([
             pa.field("id",                pa.string()),
             pa.field("text",              pa.string()),
@@ -1122,19 +1614,43 @@ class CorpusLoader:
             pa.field("subsection",        pa.string()),
             pa.field("subsection_vector", pa.list_(pa.float32(), self.embedding_dim)),
         ])
-        if "designs" in db.table_names():
+        progress = TerminalProgressBar("Writing designs", 1)
+        if self._table_exists(db, "designs"):
             db.drop_table("designs")
         table = db.create_table("designs", data=records, schema=schema)
         table.create_fts_index("text", replace=True)
-        print(f"designs table: {table.count_rows()} rows written.")
+        progress.advance()
+        progress.finish()
 
-    def load_basics(self):
-        print("\n=== Loading basics ===")
-        db = self._connect_db()
-
-        if not self.basics_dir.exists():
-            print(f"Error: {self.basics_dir} does not exist.")
+    def load_designs(self):
+        records = self._collect_designs_records()
+        if not records:
             return
+        self._embed_designs_records(records)
+        self._write_designs_records(records)
+
+    def _basic_records_for_pdf(self, pdf_path: Path, category: str) -> list[dict]:
+        source_path = self._source_path(pdf_path)
+        title = pdf_path.stem
+        records: list[dict] = []
+        for chunk_id, (page_num, chunk) in enumerate(self._chunk_pdf_by_page(pdf_path)):
+            chapter = self._extract_chapter_from_page(chunk)
+            records.append({
+                "id":          f"{pdf_path.stem}_{chunk_id:04d}",
+                "text":        chunk,
+                "source":      pdf_path.name,
+                "chunk_id":    chunk_id,
+                "page":        page_num,
+                "source_path": source_path,
+                "category":    category,
+                "title":       title,
+                "chapter":     chapter,
+            })
+        return records
+
+    def _collect_basics_records(self) -> list[dict]:
+        if not self.basics_dir.exists():
+            return []
 
         records: list[dict] = []
         for subdir in sorted(self.basics_dir.iterdir()):
@@ -1142,34 +1658,24 @@ class CorpusLoader:
                 continue
             category = subdir.name
             pdf_files = sorted(subdir.glob("*.pdf"))
-            print(f"  Category [{category}]: {len(pdf_files)} PDFs")
-            for pdf_path in tqdm(pdf_files, desc=f"  {category}"):
-                source_path = self._source_path(pdf_path)
-                title = pdf_path.stem
-                for chunk_id, (page_num, chunk) in enumerate(self._chunk_pdf_by_page(pdf_path)):
-                    chapter = self._extract_chapter_from_page(chunk)
-                    records.append({
-                        "id":          f"{pdf_path.stem}_{chunk_id:04d}",
-                        "text":        chunk,
-                        "source":      pdf_path.name,
-                        "chunk_id":    chunk_id,
-                        "page":        page_num,
-                        "source_path": source_path,
-                        "category":    category,
-                        "title":       title,
-                        "chapter":     chapter,
-                    })
+            self._load_model()
+            worker = lambda path, category=category: self._basic_records_for_pdf(path, category)
+            for pdf_records in self._map_files(pdf_files, worker, f"  {category}"):
+                records.extend(pdf_records)
 
-        if not records: return
-        print(f"Total basics chunks: {len(records)}")
-        text_vectors    = self._embed([r["text"]    for r in records])
-        title_vectors   = self._embed([r["title"]   for r in records])
-        chapter_vectors = self._embed([r["chapter"] for r in records])
+        return records
+
+    def _embed_basics_records(self, records: list[dict]) -> None:
+        text_vectors    = self._embed([r["text"]    for r in records], "Embedding basics text")
+        title_vectors   = self._embed([r["title"]   for r in records], "Embedding basics title")
+        chapter_vectors = self._embed([r["chapter"] for r in records], "Embedding basics chapter")
         for r, tv, bv, cv in zip(records, text_vectors, title_vectors, chapter_vectors):
             r["text_vector"]    = tv
             r["title_vector"]   = bv
             r["chapter_vector"] = cv if r["chapter"] else tv  # 빈 chapter이면 text_vector 복사
 
+    def _write_basics_records(self, records: list[dict]) -> None:
+        db = self._connect_db()
         schema = pa.schema([
             pa.field("id",             pa.string()),
             pa.field("text",           pa.string()),
@@ -1184,82 +1690,48 @@ class CorpusLoader:
             pa.field("chapter",        pa.string()),
             pa.field("chapter_vector", pa.list_(pa.float32(), self.embedding_dim)),
         ])
-        if "basics" in db.table_names():
+        progress = TerminalProgressBar("Writing basics", 1)
+        if self._table_exists(db, "basics"):
             db.drop_table("basics")
         table = db.create_table("basics", data=records, schema=schema)
         table.create_fts_index("text", replace=True)
-        print(f"basics table: {table.count_rows()} rows written.")
+        progress.advance()
+        progress.finish()
 
-    def _extract_md_page_num(self, entry_text: str) -> int:
-        match = re.search(r"^## Page\s+(\d+)", entry_text, flags=re.MULTILINE)
-        return int(match.group(1)) if match else 0
+    def load_basics(self):
+        records = self._collect_basics_records()
+        if not records:
+            return
+        self._embed_basics_records(records)
+        self._write_basics_records(records)
 
-    def _extract_md_field(self, entry_text: str, label: str) -> str:
-        pattern = rf"(?m)^-\s*{re.escape(label)}\s*:\s*(.+?)\s*$"
-        match = re.search(pattern, entry_text)
-        return self._clean_inline_text(match.group(1)) if match else ""
-
-    def _split_md_chemical_name(self, raw_name: str) -> tuple[str, str]:
-        raw_name = self._clean_inline_text(raw_name)
-        if "|" in raw_name:
-            ko, en = raw_name.split("|", 1)
-            return ko.strip(), en.strip()
-        return self._split_korean_english_name(raw_name)
-
-    def _build_md_chemical_name(self, entry_text: str) -> str:
-        raw_name = self._extract_md_field(entry_text, "물질명")
-        korean_name, english_name = self._split_md_chemical_name(raw_name)
-        if korean_name and english_name:
-            base = f"{korean_name}({english_name})"
-        else:
-            base = korean_name or english_name or raw_name or "이름 미상"
-
-        alias_ko = self._extract_md_field(entry_text, "국문 유사명")
-        alias_en = self._extract_md_field(entry_text, "영문 유사명")
-        aliases = ", ".join(part for part in [alias_ko, alias_en] if part)
-        return f"{base} | {aliases}" if aliases else base
-
-    def _extract_chemical_md_entries(self, path: Path) -> list[dict]:
-        text = path.read_text(encoding="utf-8")
-        starts = [m.start() for m in re.finditer(r"(?m)^## Page\s+\d+\s*$", text)]
-        entries: list[dict] = []
-        for idx, start in enumerate(starts):
-            end = starts[idx + 1] if idx + 1 < len(starts) else len(text)
-            entry_text = text[start:end].strip()
-            if "[물질 정보]" not in entry_text:
-                continue
-            entries.append({
-                "page": self._extract_md_page_num(entry_text),
-                "text": entry_text,
-                "chemical_name": self._build_md_chemical_name(entry_text),
-            })
-        return entries
-
-    def load_chemicals(self):
-        print("\n=== Loading chemicals ===")
-        db = self._connect_db()
-
-        md_files = sorted(self.chemicals_dir.glob("*.md"))
-        print(f"Found {len(md_files)} chemicals MDs")
+    def _collect_chemicals_records(self) -> list[dict]:
+        pdf_files = sorted(self.chemicals_dir.glob("*.pdf"))
+        if len(pdf_files) != 1:
+            raise ValueError("chemicals corpus must contain exactly one PDF.")
 
         records: list[dict] = []
-        for md_path in tqdm(md_files, desc="  Chemicals MDs"):
-            source_path = self._source_path(md_path)
-            for chunk_id, entry in enumerate(self._extract_chemical_md_entries(md_path)):
+        progress = TerminalProgressBar("Chemicals PDFs", len(pdf_files))
+        for pdf_path in pdf_files:
+            source_path = self._source_path(pdf_path)
+            for chunk_id, entry in enumerate(self._extract_chemical_entries(pdf_path)):
                 records.append({
-                    "id":            f"{md_path.stem}_{chunk_id:04d}",
-                    "text":          entry["text"],
-                    "source":        md_path.name,
+                    "id":            f"{pdf_path.stem}_{chunk_id:04d}",
+                    "text":          self._build_chemical_markdown_text(entry["text"]),
+                    "source":        pdf_path.name,
                     "chunk_id":      chunk_id,
                     "page":          entry["page"],
                     "source_path":   source_path,
-                    "chemical_name": entry["chemical_name"],
+                    "chemical_name": self._build_chemical_name(entry["text"]),
                 })
+            progress.advance()
+        progress.finish()
 
-        if not records: return
-        print(f"Total chemical entries: {len(records)}")
-        text_vectors = self._embed([r["text"] for r in records])
-        chemical_name_vectors = self._embed([r["chemical_name"] for r in records])
+        return records
+
+    def _embed_chemicals_records(self, records: list[dict]) -> None:
+        text_vectors = self._embed([r["text"] for r in records], "Embedding chemicals text")
+        chemical_name_vectors = self._embed([r["chemical_name"] for r in records], "Embedding chemicals name")
         for r, text_v, chemical_name_v in zip(
             records,
             text_vectors,
@@ -1268,6 +1740,8 @@ class CorpusLoader:
             r["text_vector"] = text_v
             r["chemical_name_vector"] = chemical_name_v
 
+    def _write_chemicals_records(self, records: list[dict]) -> None:
+        db = self._connect_db()
         schema = pa.schema([
             pa.field("id",       pa.string()),
             pa.field("text",     pa.string()),
@@ -1279,38 +1753,60 @@ class CorpusLoader:
             pa.field("chemical_name", pa.string()),
             pa.field("chemical_name_vector", pa.list_(pa.float32(), self.embedding_dim)),
         ])
-        if "chemicals" in db.table_names():
+        progress = TerminalProgressBar("Writing chemicals", 1)
+        if self._table_exists(db, "chemicals"):
             db.drop_table("chemicals")
-        table = db.create_table("chemicals", data=records, schema=schema)
-        print(f"chemicals table: {table.count_rows()} rows written.")
+        db.create_table("chemicals", data=records, schema=schema)
+        progress.advance()
+        progress.finish()
+
+    def load_chemicals(self):
+        records = self._collect_chemicals_records()
+        if not records:
+            return
+        self._embed_chemicals_records(records)
+        self._write_chemicals_records(records)
+
+    def _run_load_step(self, name: str, loader) -> None:
+        loader()
+
+    def load_tables(self, table_names: list[str] | tuple[str, ...]):
+        for table_name in table_names:
+            self._run_load_step(table_name, getattr(self, f"load_{table_name}"))
 
     def load_all(self):
-        self.load_accidents()
-        self.load_laws()
-        self.load_designs()
-        self.load_chemicals()
-        self.load_basics()
-        print("\n=== All tables loaded successfully ===")
+        self.load_tables(TABLE_NAMES)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Load corpus documents into LanceDB.")
-    parser.add_argument(
-        "--table",
-        choices=["accidents", "laws", "designs", "chemicals", "basics", "all"],
-        default="all",
-        help="Which table to build (default: all)",
+    parser = argparse.ArgumentParser(
+        description="Load corpus documents into LanceDB.",
+        allow_abbrev=False,
     )
     parser.add_argument(
-        "--embed-model",
-        choices=list(EMBED_MODEL_VARIANTS.keys()),
-        default=DEFAULT_EMBED_MODEL,
-        help=f"임베딩 모델 선택 (default: {DEFAULT_EMBED_MODEL}). 모델을 바꾸면 DB 전체 재빌드 필요.",
+        "--table",
+        choices=TABLE_NAMES + ("all",),
+        help="빌드할 단일 카테고리입니다. all을 지정하면 전체 카테고리를 빌드합니다.",
+    )
+    parser.add_argument(
+        "--tables",
+        nargs="+",
+        choices=TABLE_NAMES,
+        help="빌드할 카테고리 목록입니다. 생략하면 전체 카테고리를 직렬 빌드합니다.",
     )
     args = parser.parse_args()
 
-    CONFIG["EMBEDDING_MODEL"] = EMBED_MODEL_VARIANTS[args.embed_model]
-    print(f"임베딩 모델: {CONFIG['EMBEDDING_MODEL']}")
+    if args.table and args.tables:
+        parser.error("--table and --tables cannot be used together")
+
+    if args.table == "all":
+        target_tables = list(TABLE_NAMES)
+    elif args.table:
+        target_tables = [args.table]
+    elif args.tables:
+        target_tables = args.tables
+    else:
+        target_tables = list(TABLE_NAMES)
 
     loader = CorpusLoader()
     dispatch = {
@@ -1319,6 +1815,11 @@ if __name__ == "__main__":
         "designs":   loader.load_designs,
         "chemicals": loader.load_chemicals,
         "basics":    loader.load_basics,
-        "all":       loader.load_all,
     }
-    dispatch[args.table]()
+    try:
+        if len(target_tables) == 1:
+            dispatch[target_tables[0]]()
+        else:
+            loader.load_tables(target_tables)
+    finally:
+        print()

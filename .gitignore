@@ -1,5 +1,7 @@
-data/
-HF token.txt
+__pycache__
 .codex
 .agents
-models
+data
+models/embedding/
+vector_db/__pycache__
+HF token.txt

@@ -3,18 +3,24 @@ from __future__ import annotations
 import argparse
 import random
 import re
+import sys
 from collections import Counter
+from pathlib import Path
 from statistics import mean, median
 from typing import Any
 
 import lancedb
 
-try:
-    from vector_db.vector_db_config import VECTOR_DB_CONFIG, resolve_vector_db_path
-except ModuleNotFoundError:
-    from vector_db_config import VECTOR_DB_CONFIG, resolve_vector_db_path
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-DEFAULT_TABLES = ["accidents", "laws", "designs", "chemicals", "basics"]
+try:
+    from vector_db.vectordb_builder import TABLE_NAMES, VECTOR_DB_CONFIG, resolve_vector_db_path
+except ModuleNotFoundError:
+    from vectordb_builder import TABLE_NAMES, VECTOR_DB_CONFIG, resolve_vector_db_path
+
+DEFAULT_TABLES = list(TABLE_NAMES)
 EXPECTED_ROW_COUNTS = {
     "chemicals": 460,
 }
